@@ -1,0 +1,64 @@
+version: '2'
+services:
+  datastore:
+    image: busybox
+    volumes:
+      - bundle_install:/usr/local/bundle
+      - node_modules:/hanami-webpack-sample/node_modules
+      - postgres:/var/lib/postgresql/data
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes_from:
+      - datastore
+  app:
+    build: .
+    tty: true
+    stdin_open: true
+    command:  bundle exec hanami server --host=0.0.0.0 --port=3000
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=password
+      - WEBPACK_DEV_SERVER_HOST=frontend
+      - WEBPACK_DEV_SERVER_PORT=3020
+      - INBUILT_WEBPACK_DEV_SERVER=true
+      - WEBPACK_DEV_SERVER
+    volumes_from:
+      - datastore
+    volumes:
+      - .:/hanami-webpack-sample
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+
+  frontend:
+    build: .
+    tty: true
+    stdin_open: true
+    volumes_from:
+      - datastore
+    volumes:
+      - .:/hanami-webpack-sample
+    command: yarn dev
+    environment:
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - app
+
+volumes:
+  bundle_install:
+    driver: local
+  node_modules:
+    driver: local
+  postgres:
+    driver: local
