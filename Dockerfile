@@ -1,6 +1,6 @@
-FROM ruby:2.6.3
+FROM ruby:2.5
 ENV LANG C.UTF-8
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev unzip libldap2-dev libidn11-dev fonts-migmix
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev unzip libldap2-dev libidn11-dev fonts-migmix postgresql postgresql-client
 
 # Node.js
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
@@ -15,9 +15,9 @@ RUN npm install -g yarn
 #     && apt-get update && apt-get install -y google-chrome-stable
 
 WORKDIR /hanami-webpack-sample
-# ADD package.json /spa-rails-api-sample/package.json
-# ADD yarn.lock /spa-rails-api-sample/yarn.lock
-# RUN yarn install
+ADD package.json /hanami-webpack-sample/package.json
+ADD yarn.lock /hanami-webpack-sample/yarn.lock
+RUN yarn install
 ADD Gemfile Gemfile
 ADD Gemfile.lock Gemfile.lock
 RUN bundle install --jobs 4

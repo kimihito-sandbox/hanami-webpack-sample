@@ -6,7 +6,9 @@ var devServerPort = process.env.WEBPACK_DEV_SERVER_PORT,
     publicPath = process.env.WEBPACK_PUBLIC_PATH;
 
 var config = {
-  entry: {},
+  entry: {
+    web: './apps/web/assets/javascripts/application.js'
+  },
 
   output: {
     path: path.join(__dirname, "public"),
@@ -14,7 +16,7 @@ var config = {
   },
 
   resolve: {
-    root: path.join(__dirname, "apps")
+    modules: [path.join(__dirname, "apps"), 'node_modules']
   },
 
   plugins: [
@@ -25,7 +27,8 @@ var config = {
 if (process.env.INBUILT_WEBPACK_DEV_SERVER) {
   config.devServer = {
     port: devServerPort,
-    headers: { "Access-Control-Allow-Origin": "*" }
+    headers: { "Access-Control-Allow-Origin": "*" },
+    host: "0.0.0.0"
   };
   config.output.publicPath = "//" + devServerHost + ":" + devServerPort + "/";
 }
